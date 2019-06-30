@@ -211,11 +211,17 @@ h1, h2, h3, h4, h5, h6, figure {
   color: #fff;
 }
 .gtco-nav ul li.btn-cta a {
+  position: absolute;
   color: #FBB448;
+  top: -33px;
+  right: -129px;
+}
+span {
+  height: 37px;
 }
 .gtco-nav ul li.btn-cta a span {
   border: 2px solid rgba(255, 255, 255, 0.5);
-  padding: 4px 20px;
+  padding: 0px 7px;
   color: #fff;
   display: -moz-inline-stack;
   display: inline-block;

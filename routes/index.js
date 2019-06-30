@@ -46,6 +46,10 @@ router.get('/reservations', function(req, res, next){
     h1: 'Reserve uma mesa!'
    });
 });
+/* POST reservation */
+router.post('/reservations', function(req, res, next){
+   res.send(req.body);
+});
 
 /* GET services */
 router.get('/services', function(req, res, next){
@@ -58,5 +62,3 @@ router.get('/services', function(req, res, next){
 
 
 module.exports = router;
-
-//dar continuidade na aula 170 MY11 1:17min
