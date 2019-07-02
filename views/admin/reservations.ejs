@@ -64,17 +64,19 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1.</td>
-                  <td>Hcode</td>
-                  <td>jhonathanpribeiro@gmail.com</td>
-                  <td>2</td>
-                  <td>1/1/2019</td>
-                  <td>10:30</td>
+              <% data.forEach(row => {%>
+                <tr data-row="<%= JSON.stringify(row) %>">
+                  <td><%= row.id%></td>
+                  <td><%= row.name%></td>
+                  <td><%= row.email%></td>
+                  <td><%= row.people%></td>
+                  <td><%= moment(row.date).format("DD [de] MMMM [de] YYYY")%></td>
+                  <td><%= row.time%></td>
                   <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal" data-target="#modal-update"><i
                         class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
                         class="fa fa-trash"></i> Excluir</button></td>
                 </tr>
+              <% }); %>
               </tbody>
             </table>
           </div>
@@ -197,4 +199,22 @@
       <!-- /.modal-dialog -->
     </div>
     <%- include('inc/footer') -%>
-  </div>
+    <script src="/js/JR-formsave.js"></script>
+<script>
+
+let formCreate = document.querySelector("#modal-create form");
+  formCreate.save().then(json=>{
+   window.location.reload();
+  }).catch(err =>{
+    console.log(err);
+  });
+
+let formUpdate = document.querySelector("#modal-update form");
+  formUpdate.save().then(json=>{
+    window.location.reload();
+  }).catch(err =>{
+    console.log(err);
+  });
+
+
+</script>

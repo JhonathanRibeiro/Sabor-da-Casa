@@ -1,7 +1,14 @@
 var express = require('express');
 var users = require('./../inc/users');
 var admin = require('./../inc/admin');
+var menus = require('./../inc/menus'); 
+var reservations = require('./../inc/reservations'); 
+var moment = require('moment');
 var router = express.Router();
+
+//especiica o idioma do moment 
+//deixando a data em português
+moment.locale("pt-BR");
 
 //middleware responsável por autenticar os acessos
 //do usuário, bloquenado o acesso direto pela url
@@ -31,8 +38,13 @@ router.get('/logout', function(req, res, nex){
 
 //Home page Administração - Rota principal
 router.get('/', function(req, res, next){
-    res.render("admin/index", {
-        menus: req.menus
+
+    admin.dashboard().then(data => {
+      res.render("admin/index", admin.getParams(req, {
+        data
+      }));
+    }).catch(err =>{
+        console.log(err);
     });
 });
 
@@ -62,35 +74,70 @@ router.get('/login', function(req, res, next){
 //responsável por renderizar a administração
 //da página de contatos
 router.get('/contacts', function(req, res, next){
-    res.render("admin/contacts", {
-        menus: req.menus
-    });
+    res.render("admin/contacts", admin.getParams(req));
 });
 //responsável por renderizar a administração dos e-mails
 router.get('/emails', function(req, res, next){
-    res.render("admin/emails", {
-        menus: req.menus
-    });
+    res.render("admin/emails", admin.getParams(req));
 });
 //responsável por renderizar a administração da 
 //dos menus
 router.get('/menus', function(req, res, next){
-    res.render("admin/menus", {
-        menus: req.menus
+    
+    menus.getMenus().then(data => { 
+      res.render("admin/menus", admin.getParams(req, {
+        data
+      }));
     });
 });
+//envio dos dados para o banco - cria um novo menu
+router.post("/menus", function(req, res, next){
+    menus.save(req.fields, req.files).then(results =>{
+      res.send(results);
+    }).catch(err=>{
+        res.send(err);
+    });
+});
+//rota de delete do menu
+router.delete("/menus/:id", function(req, res, next){
+    menus.delete(req.params.id).then(results =>{
+        res.send(results);
+    }).catch(err =>{
+        res.send(err);
+    });
+});
+
 //responsável por renderizar a administração das reservas. 
 router.get('/reservations', function(req, res, next){
-    res.render("admin/reservations", {
-        date:{},
-        menus: req.menus
+    reservations.getReservations().then(data =>{
+        res.render("admin/reservations", admin.getParams(req, {
+            date: {},
+            data,
+            moment
+        }));
     });
 });
+
+//envio dos dados para o banco - cria um novo menu
+router.post("/reservations", function(req, res, next){
+    reservations.save(req.fields, req.files).then(results =>{
+      res.send(results);
+    }).catch(err=>{
+        res.send(err);
+    });
+});
+//rota de delete do menu
+router.delete("/reservations/:id", function(req, res, next){
+    reservations.delete(req.params.id).then(results =>{
+        res.send(results);
+    }).catch(err =>{
+        res.send(err);
+    });
+});
+
 //responsável por renderizar a administração dos usuários 
 router.get('/users', function(req, res, next){
-    res.render("admin/users", {
-        menus: req.menus
-    });
+    res.render("admin/users", admin.getParams(req));
 });
 
 module.exports = router;

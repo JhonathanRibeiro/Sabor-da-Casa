@@ -36,16 +36,20 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1.</td>
-                  <td><img src="dist/img/boxed-bg.jpg" alt="" style="height: 18px;"></td>
-                  <td>Update software</td>
-                  <td>Diuretics paradis num copo é motivis de denguis.</td>
-                  <td>R$1,99</td>
-                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal" data-target="#modal-update"><i
-                        class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
-                        class="fa fa-trash"></i> Excluir</button></td>
+              <% data.forEach(function(row){%>
+                <tr data-row="<%= JSON.stringify(row); %>">
+                  <td><%= row.id %></td>
+                  <td><img src="/<%= row.photo %>" alt="" style="height: 18px;"></td>
+                  <td><%= row.title %></td>
+                  <td><%= row.description %></td>
+                  <td><%= row.price %></td>
+                  <td><button type="button" class="btn btn-xs btn-info btn-update"><i
+                        class="fa fa-pencil"></i> Editar</button>&nbsp;
+                      <button type="button" class="btn btn-xs btn-danger btn-delete"><i
+                        class="fa fa-trash"></i> Excluir</button>
+                  </td>
                 </tr>
+                <% }); %>
               </tbody>
             </table>
           </div>
@@ -60,7 +64,7 @@
     <div class="modal fade" id="modal-create">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00a65a;">
-          <form method="post">
+          <form method="post" action="/admin/menus">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -95,12 +99,12 @@
         <!-- /.modal-content -->
       </div>
       <!-- /.modal-dialog -->
-    </div>
+    </div><!--//modal-create-->
 
     <div class="modal fade" id="modal-update">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00c0ef;">
-          <form method="post">
+          <form method="post" action="/admin/menus">
             <input type="hidden" name="id">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -136,6 +140,80 @@
         <!-- /.modal-content -->
       </div>
       <!-- /.modal-dialog -->
-    </div>
+    </div><!--//modal-update-->
    <%- include('inc/footer') -%>
-  </div>
+<!--plugin de preview de imagens-->
+<script src="/js/JR-filereader.js"></script>
+<script src="/js/JR-formsave.js"></script>
+
+<!--
+Script responsável por criar um novo menu no site.
+-->
+<script>
+
+  new JRFileReader("#modal-create [type=file]", "#modal-create img");
+  new JRFileReader("#modal-update [type=file]", "#modal-update img");
+
+ //cria um novo menu, salvando no banco e recarregando a página
+  let formCreate = document.querySelector("#modal-create form");
+  formCreate.save().then(json=>{
+    window.location.reload();
+  }).catch(err =>{
+    console.log(err);
+  });
+//edita um menu, atualizando no banco e recarregando a página
+let formUpdate = document.querySelector("#modal-update form");
+  formUpdate.save().then(json=>{
+    window.location.reload();
+  }).catch(err =>{
+    console.log(err);
+  });
+
+//deleta menu
+[...document.querySelectorAll('.btn-delete')].forEach(btn =>{
+  btn.addEventListener('click', e =>{
+     
+     let tr = e.path.find(el =>{
+      return (el.tagName.toUpperCase() === 'TR');
+    });
+    let data = JSON.parse(tr.dataset.row);
+
+    if (confirm(`Deseja realmente excluir o menu ${data.title}?`)) {
+    
+    fetch(`/admin/menus/${data.id}`, {
+      method:'DELETE'
+    })
+      .then(response => response.json())
+      .then(json => {
+        window.location.reload();
+      });
+    }
+  });
+});
+
+//edita menu
+[...document.querySelectorAll('.btn-update')].forEach(btn =>{
+  btn.addEventListener('click', e =>{
+    let tr = e.path.find(el =>{
+      return (el.tagName.toUpperCase() === 'TR');
+    });
+
+    let data = JSON.parse(tr.dataset.row);
+    for (let name in data) {
+
+    switch (name) {
+      
+      case 'photo':
+        formUpdate.querySelector("img").src = '/'+data[name];
+    break;
+      default:
+      let input = formUpdate.querySelector(`[name=${name}]`);
+         if(input) input.value = data[name];
+     } 
+    }
+    $('#modal-update').modal('show');
+
+  });
+});
+
+</script>
