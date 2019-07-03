@@ -72,7 +72,7 @@
                   <td><%= row.people%></td>
                   <td><%= moment(row.date).format("DD [de] MMMM [de] YYYY")%></td>
                   <td><%= row.time%></td>
-                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal" data-target="#modal-update"><i
+                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="" data-target="#modal-update"><i
                         class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
                         class="fa fa-trash"></i> Excluir</button></td>
                 </tr>
@@ -201,44 +201,12 @@
     <%- include('inc/footer') -%>
     <script src="/js/moment.min.js"></script>
     <script src="/js/JR-formsave.js"></script>
+    <script src="/js/JR-grid.js"></script>
 <script>
 
-let formCreate = document.querySelector("#modal-create form");
-  formCreate.save().then(json=>{
-   window.location.reload();
-  }).catch(err =>{
-    console.log(err);
-  });
-
-let formUpdate = document.querySelector("#modal-update form");
-  formUpdate.save().then(json=>{
-    window.location.reload();
-  }).catch(err =>{
-    console.log(err);
-  });
-
-//update reservations
-[...document.querySelectorAll('.btn-update')].forEach(btn =>{
-  btn.addEventListener('click', e =>{
-    let tr = e.path.find(el =>{
-      return (el.tagName.toUpperCase() === 'TR');
-    });
-
-    let data = JSON.parse(tr.dataset.row);
-    for (let name in data) {
-
-    let input = formUpdate.querySelector(`[name=${name}]`);
-
-    switch (name) {
-      case 'date':
-         if(input) input.value = moment(data[name]).format('YYYY-MM-DD');
-        break;
-      default:
-         if(input) input.value = data[name];
-     } 
-    }
-
-  });
-});
+ new JGrid({
+   deleteUrl: '/admin/reservations/${data.id}',
+   deleteMsg: 'Deseja realmente excluir a reserva de ${data.name}?'
+ });
 
 </script>
